@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "miapp.api",
+    "type": "java.lang.String",
+    "description": "A description for 'miapp.api'"
+  },
+  {
+    "name": "miapp.test",
+    "type": "java.lang.String",
+    "description": "A description for 'miapp.test'"
+  }
+]}
