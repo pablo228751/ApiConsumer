@@ -1,6 +1,6 @@
 {"properties": [
   {
-    "name": "miapp.api",
+    "name": "miapp.apiToken",
     "type": "java.lang.String",
     "description": "A description for 'miapp.api'"
   },
@@ -8,5 +8,15 @@
     "name": "miapp.test",
     "type": "java.lang.String",
     "description": "A description for 'miapp.test'"
+  },
+  {
+    "name": "miapp.client_id",
+    "type": "java.lang.String",
+    "description": "A description for 'miapp.client_id'"
+  },
+  {
+    "name": "miapp.client_secret",
+    "type": "java.lang.String",
+    "description": "A description for 'miapp.client_secret'"
   }
 ]}

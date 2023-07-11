@@ -1,5 +1,3 @@
-#client_id: 3848nekvugefsce0irdqsj23ud
-#client_secret: n3moa7estdcdlqk4abqm4t9ns6fmkl8g2ntmaose4ibdgeur8ut
 server:
     port: 8100
 spring:
@@ -16,10 +14,10 @@ spring:
         database: mysql
         show-sql: true
 miapp:
-    api: https://turnero.auth.us-east-1.amazoncognito.com/oauth2
-    test: https://turnostest.cba.gov.ar/api
-
-    
+    apiToken: https://turnero.auth.us-east-1.amazoncognito.com/oauth2/token
+    test: https://turnostest.cba.gov.ar/api/Externa/turnos/agendados
+    client_id: 3848nekvugefsce0irdqsj23ud
+    client_secret: n3moa7estdcdlqk4abqm4t9ns6fmkl8g2ntmaose4ibdgeur8ut   
 
 debug: false
 
