@@ -29,7 +29,7 @@ public class Dato5Setup {
         if (expiro) {
 
             log.info("Iniciando SISTEMA...");
-            // barreraService.mostrar();
+            barreraService.mostrar();
             // log.info(consumirApi.generarToken().toString());
             RegisteredUserResponse responseBody = consumirApi.generarToken();
             log.info(responseBody.toString());

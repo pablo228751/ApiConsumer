@@ -4,9 +4,9 @@ spring:
     application:
         name: auto
     datasource:
-        url: jdbc:mysql://localhost:3306/muni
-        username: root
-        password:
+        url: jdbc:mysql://www.unont.com.ar:3306/Municba
+        username: x077vm05_unont
+        password: Altos1948
     jpa:
         hibernate:
             ddl-auto: update
