@@ -5,12 +5,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import ar.com.unont.dato5.Dato5Setup;
 import ar.com.unont.dato5.entity.RegisteredUserResponse;
@@ -79,25 +81,32 @@ public class ConsumirApiImpl implements ConsumirApi {
     @Override
     public Turnero consultaTurnos(Map<String, String> parametros) {
         String url = consumerUrl;
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        for (Map.Entry<String, String> entry : parametros.entrySet()) {
+            builder.queryParam(entry.getKey(), entry.getValue());
+        }
+        String fullUrl = builder.toUriString();
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(Dato5Setup.token);
 
-        // Construir los parámetros de la solicitud
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        for (Map.Entry<String, String> entry : parametros.entrySet()) {
-            params.add(entry.getKey(), entry.getValue());
-        }
+        // crear la entidad de solicitud con los encabezados
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
-        // Construir el cuerpo de la solicitud con los parámetros
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(params, headers);
-
-        ResponseEntity<Turnero> response = restTemplate.postForEntity(url, requestEntity, Turnero.class);
+        // GET con los encabezados de autenticación
+        ResponseEntity<Turnero> response = restTemplate.exchange(
+                fullUrl,
+                HttpMethod.GET,
+                requestEntity,
+                Turnero.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
+        } else {
+            log.error("Error :{}", response.getStatusCode());
+            throw new RuntimeException("Error");
         }
-        log.error("Error in user login - httpStatus was: {}", response.getStatusCode());
-        throw new RuntimeException("Error");
+
     }
 
 }
