@@ -13,11 +13,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import ar.com.unont.dato5.Dato5Setup;
 import ar.com.unont.dato5.entity.RegisteredUserResponse;
 import ar.com.unont.dato5.entity.Turnero;
 import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -29,7 +29,6 @@ public class ConsumirApiImpl implements ConsumirApi {
     protected String consumerUrl;
     @Value("${miapp.client_id}")
     private String clientId;
-
     @Value("${miapp.client_secret}")
     private String clientSecret;
 
@@ -80,33 +79,40 @@ public class ConsumirApiImpl implements ConsumirApi {
 
     @Override
     public Turnero consultaTurnos(Map<String, String> parametros) {
-        String url = consumerUrl;
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        ObjectMapper objectMapper = new ObjectMapper();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(consumerUrl);
         for (Map.Entry<String, String> entry : parametros.entrySet()) {
             builder.queryParam(entry.getKey(), entry.getValue());
         }
-        String fullUrl = builder.toUriString();
+
+        String url = builder.toUriString();
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(Dato5Setup.token);
 
-        // crear la entidad de solicitud con los encabezados
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
-        // GET con los encabezados de autenticación
-        ResponseEntity<Turnero> response = restTemplate.exchange(
-                fullUrl,
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
                 HttpMethod.GET,
                 requestEntity,
-                Turnero.class);
+                String.class);
+
         if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
+            String responseBody = response.getBody();
+            try {
+                Turnero turnero = objectMapper.readValue(responseBody, Turnero.class);
+                return turnero;
+            } catch (Exception e) {
+                System.out.println("Error al convertir el JSON a objeto Turnero");
+                e.printStackTrace();
+            }
         } else {
-            log.error("Error :{}", response.getStatusCode());
+            log.error("Error: {}", response.getStatusCode());
             throw new RuntimeException("Error");
         }
 
+        return null;
     }
-
 }
