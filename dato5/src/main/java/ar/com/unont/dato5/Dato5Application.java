@@ -24,7 +24,7 @@ public class Dato5Application implements CommandLineRunner {
 			try {
 				log.info("lanzando desde Main");
 				datosetup.lanzar();
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

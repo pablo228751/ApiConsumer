@@ -1,7 +1,6 @@
 package ar.com.unont.dato5.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
-
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp; 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -31,10 +32,15 @@ public class Turnero {
     @JsonProperty("TotalPaginas")
     private int totalPaginas;
 
-
     @JsonProperty("Resultados")
     @OneToMany(mappedBy = "turnero", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Turno> resultados;
+
+    @CreationTimestamp
+    private LocalDateTime fechaCreacion;
+
+    @UpdateTimestamp
+    private LocalDateTime fechaActualizacion;
 
     @Override
     public String toString() {
@@ -44,6 +50,8 @@ public class Turnero {
                 ", totalPaginas=" + totalPaginas +
                 ", registros=" + registros +
                 ", resultados=" + resultados +
+                ", fechaCreacion=" + fechaCreacion +
+                ", fechaActualizacion=" + fechaActualizacion +
                 '}';
     }
 }

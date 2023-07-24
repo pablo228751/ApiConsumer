@@ -1,5 +1,9 @@
 package ar.com.unont.dato5.entity;
 
+import java.time.LocalDate;
+
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
@@ -35,4 +39,6 @@ public class Turno {
      @ManyToOne
     @JoinColumn(name = "turnero_id")
     private Turnero turnero;
+    @UpdateTimestamp
+    private LocalDate fechaActualizacion;
 }

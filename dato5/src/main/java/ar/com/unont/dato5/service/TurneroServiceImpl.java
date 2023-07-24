@@ -5,6 +5,8 @@ import ar.com.unont.dato5.entity.Turno;
 import ar.com.unont.dato5.repository.ITurneroRepository;
 import ar.com.unont.dato5.repository.ITurnoRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,12 @@ public class TurneroServiceImpl implements ITurneroService {
             turno.setTurnero(turnero); // Establecer la relación Turnero-Turno
             turnoRepository.save(turno); // Persistir el objeto Turno
         }
+    }
+
+    @Override
+    public List<Turno> selectTurnos() {
+        LocalDate fechaActual = LocalDate.now();
+        return turnoRepository.findByFechaActualizacion(fechaActual);
     }
 
 }
