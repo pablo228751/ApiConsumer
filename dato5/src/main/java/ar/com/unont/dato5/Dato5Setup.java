@@ -2,8 +2,10 @@ package ar.com.unont.dato5;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,8 +44,10 @@ public class Dato5Setup {
     public void lanzar() {
         if (expiro) {
             log.info("Iniciando SISTEMA...");
-            //TurnosMemo recupera una lista de Turnos en la base Mysql
-            //turnosMemo();
+            // TurnosMemo recupera una lista de Turnos en la base Mysql
+            turnosMemo();
+            // System.out.println("CORTAR FLUJO");
+            // System.exit(0);
 
             barreraService.mostrar();
             RegisteredUserResponse responseBody = consumirApi.generarToken();
@@ -82,26 +86,29 @@ public class Dato5Setup {
             System.out.println("**************************************************************");
 
             if (turnero.getRegistros() > 0) {
-                boolean turnoIdNoExiste = turnoIdExiste(turnero.getResultados());
-                if (turnoIdNoExiste) {
-                    // Guardar el objeto Turnero en la base de datos
-                    turneroService.insertTurnero(turnero);
-                }
+                // Guardar el objeto Turnero en la base de datos
+                persistTurnero(turnero);
 
             } else {
                 log.info("SIN TURNOS");
             }
-
-            // Cortar momentáneamente el flujo del programa
-            // system.exit(0);
         }
     }
 
-    private boolean turnoIdExiste(List<Turno> turnos) {
-        // for (Turno turno : turnos) {
-        // return true;
-        // }
-        return true;
+    private void persistTurnero(Turnero turnero) {
+        for (Turno turno : turnero.getResultados()) {
+            boolean turnoExiste = false;
+            for (Turno turnoDia : turnosDiarios) {
+                if (turno.getTurnoId().equals(turnoDia.getTurnoId())) {
+                    System.out.println("Ya existe turnoID: " + turno.getTurnoId());
+                    turnoExiste = true;
+                }
+            }
+            if (!turnoExiste) {
+                turneroService.insertTurnero(turnero);
+                turnosDiarios.add(turno);
+            }
+        }
     }
 
     private void turnosMemo() {
@@ -112,12 +119,5 @@ public class Dato5Setup {
             log.info("Nombre: " + turno.getNombreCompleto());
             log.info("FechaTurno: " + turno.getFechaTurno());
         }
-        try {
-            Thread.sleep(60000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
     }
 }
