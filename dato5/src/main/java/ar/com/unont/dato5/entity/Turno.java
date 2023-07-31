@@ -41,4 +41,19 @@ public class Turno {
     private Turnero turnero;
     @UpdateTimestamp
     private LocalDate fechaActualizacion;
+
+    @Override
+    public String toString() {
+        return "Turno{" +
+                "id=" + id +
+                ", turnoId=" + turnoId +
+                ", nombreCompleto='" + nombreCompleto + '\'' +
+                ", tramite='" + tramite + '\'' +
+                ", fechaTurno='" + fechaTurno + '\'' +
+                ", centroAtencion='" + centroAtencion + '\'' +
+                ", email='" + email + '\'' +
+                ", dni='" + dni + '\'' +
+                ", fechaActualizacion=" + fechaActualizacion +
+                '}';
+    }
 }

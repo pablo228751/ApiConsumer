@@ -20,15 +20,8 @@ public class Dato5Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		while (true) {
-			try {
-				log.info("lanzando desde Main");
-				datosetup.lanzar();
-				Thread.sleep(10000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		log.info("lanzando desde Main");
+		datosetup.lanzar();
 	}
 
 }

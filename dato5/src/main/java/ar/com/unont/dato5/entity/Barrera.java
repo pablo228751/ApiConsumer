@@ -1,35 +1,45 @@
 package ar.com.unont.dato5.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
-@Entity
+import java.io.Serializable;
+
 @Data
-public class Barrera {
+@Entity
+@Table(name = "barrera")
+public class Barrera implements Serializable {
+
     @Id
-    private int id;
-    @Column
+    private Long barrera_id;
+
     private String descripcion;
-    @Column
     private String detalles;
-    @Column
     private int activa;
-    @Column
     private String ip;
-    @Column
-    private String ingegr;
-    @Column
-    private String base;
-    @Column
-    private String usuario;
-    @Column
-    private String clave;
-    @Column
     private String puerto;
-    @Column
+    private String ingegr;
+    private String base;
+    private String usuario;
+    private String clave;
     private int nrobarrera;
 
-    
+    @Override
+    public String toString() {
+        return "Barrera{" +
+                "id=" + barrera_id +
+                ", descripcion='" + descripcion + '\'' +
+                ", detalles='" + detalles + '\'' +
+                ", activa=" + activa +
+                ", ip='" + ip + '\'' +
+                ", puerto='" + puerto + '\'' +
+                ", ingegr='" + ingegr + '\'' +
+                ", base='" + base + '\'' +
+                ", usuario='" + usuario + '\'' +
+                ", clave='" + clave + '\'' +
+                ", nrobarrera=" + nrobarrera +
+                '}';
+    }
 }
