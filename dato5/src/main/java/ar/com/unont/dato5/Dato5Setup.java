@@ -1,15 +1,10 @@
 package ar.com.unont.dato5;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.stereotype.Service;
 import ar.com.unont.dato5.entity.Barrera;
 import ar.com.unont.dato5.entity.RegisteredUserResponse;
@@ -18,14 +13,10 @@ import ar.com.unont.dato5.entity.Turno;
 import ar.com.unont.dato5.service.IBarreraService;
 import ar.com.unont.dato5.service.ITurneroService;
 import ar.com.unont.dato5.service.ConsumirApi;
+import ar.com.unont.dato5.service.DatabaseService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-import ar.com.unont.dato5.entity.Eventos;
 import ar.com.unont.dato5.service.IEventosService;
 
 @Slf4j
@@ -39,7 +30,6 @@ public class Dato5Setup {
     private String fec;
     private List<Turno> turnosDiarios;
     private List<Barrera> barreras;
-    private Map<Long, DataSource> dataSourcesByBarreraId = new HashMap<>();
 
     @Autowired
     private IBarreraService barreraService;
@@ -49,10 +39,13 @@ public class Dato5Setup {
     private final ITurneroService turneroService;
     @Autowired
     private final IEventosService eventosService;
+    @Autowired
+    private final DatabaseService databaseService;
 
-    public Dato5Setup(ITurneroService turneroService, IEventosService eventosService) {
+    public Dato5Setup(ITurneroService turneroService, IEventosService eventosService, DatabaseService databaseService) {
         this.turneroService = turneroService;
         this.eventosService = eventosService;
+        this.databaseService = databaseService;
     }
 
     public void lanzar() {
@@ -64,7 +57,6 @@ public class Dato5Setup {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         while (true) {
@@ -109,19 +101,9 @@ public class Dato5Setup {
                     // Guardar el objeto Turnero en la base de datos
                     if (persistTurnero(turnero)) {
                         System.out.println("");
-                        /*
-                        // Guardar en eventos en todas las barreras (molinetes)
-                        for (Barrera barrera : barreras) {
-                            DataSource dataSource = createDataSourceForBarrera(barrera);
-                            dataSourcesByBarreraId.put(barrera.getBarrera_id(), dataSource);
-                        }
 
-                        for (Barrera barrera : barreras) {
-                            for (Turno turno : turnero.getResultados()) {
-                                persistEventos(barrera, turno);
-                            }
-                        }
-                        */
+                        // Guardar en eventos en todas las barreras (molinetes)
+                        persistEventos(barreras, turnero.getResultados());
 
                     }
 
@@ -134,14 +116,13 @@ public class Dato5Setup {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
     }
 
     private boolean persistTurnero(Turnero turnero) {
-        boolean reg=false;
+        boolean reg = false;
         Iterator<Turno> iterator = turnero.getResultados().iterator();
         while (iterator.hasNext()) {
             Turno turno = iterator.next();
@@ -157,7 +138,7 @@ public class Dato5Setup {
                 if (!turnoExiste) {
                     turneroService.insertTurnero(turnero);
                     turnosDiarios.add(turno);
-                    reg=true;
+                    reg = true;
                 } else {
                     // Si el turno existe, se quita de turnero.getResultados()
                     iterator.remove();
@@ -166,10 +147,10 @@ public class Dato5Setup {
             } else {
                 turneroService.insertTurnero(turnero);
                 turnosDiarios.add(turno);
-                reg=true;
+                reg = true;
             }
         }
-        return reg;        
+        return reg;
     }
 
     private void turnosMemo() {
@@ -179,52 +160,45 @@ public class Dato5Setup {
         }
     }
 
-    private void persistEventos(Barrera barrera, Turno turno) {
-        DataSource dataSource = dataSourcesByBarreraId.get(barrera.getBarrera_id());
+    private void persistEventos(List<Barrera> barreras, List<Turno> turnero) {
+        for (Barrera barrera : barreras) {
+            int errores= 0; //cantidad de errores en un molinete
+            for (Turno turno : turnero) {
+                log.info("# BARRERA " + barrera.getIp() + " GUARDAR ->" + turno.getTurnoId());
+                Long eventoId = turno.getTurnoId();
+                String dni = turno.getDni();
+                String pago = "SI";
+                String query = "INSERT INTO eventos (evento_id, dni, pago) VALUES ('" + eventoId + "', '" + dni + "', '"
+                        + pago + "') ON DUPLICATE KEY UPDATE dni = '" + dni + "', pago = '" + pago + "'";
+                String ip = barrera.getIp().trim();
+                int puerto = Integer.valueOf(barrera.getPuerto().trim());
+                String usr = barrera.getUsuario().trim();
+                String pass = barrera.getClave().trim();
+                String db = barrera.getBase().trim();
 
-        try (Connection connection = dataSource.getConnection()) {
-            Eventos evento = new Eventos();
-            evento.setEventoId(turno.getTurnoId());
-            evento.setBarreraEntrada(barrera.getNrobarrera());
-            evento.setTarjeta("");
-            evento.setDni(turno.getDni());
-            evento.setE_s('E');
-            evento.setPago("SI");
-            evento.setFechaEntrada(null);
-            evento.setHoraEntrada(null);
-
-            // Insertar el evento en la base de datos utilizando el servicio de eventos
-            eventosService.insertarEvento(evento);
-        } catch (SQLException e) {
-            e.printStackTrace();
+                try {
+                    boolean isConnected = databaseService.openConnection(ip, puerto, usr, pass, db);
+                    if (isConnected) {
+                        int rowsAffected = databaseService.executeUpdate(query);
+                        if (rowsAffected > 0) {
+                            log.info("Se guardo correctamente el evento. Barrera: " + barrera.getIp());
+                        } else {
+                            log.error("ERROR AL GRABAR EN la barrera: " + barrera.getIp());
+                            if (errores > 1){
+                                break;
+                            }else{
+                                errores++;
+                            }                            
+                        }
+                    }
+                } catch (SQLException e) {
+                    log.error("ERROR! al conectar con la barrera: " + barrera.getIp());
+                    break;
+                } finally {
+                    databaseService.closeConnection();
+                }
+            }
         }
     }
 
-    private void insertarEvento(Connection connection, Eventos evento) throws SQLException {
-        String sql = "INSERT INTO eventos (evento_id, barrera_entrada, tarjeta, dni, e_s, fecha_entrada, hora_entrada, pago, fecha_salida, barrera_salida) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, evento.getEventoId());
-            preparedStatement.setInt(2, evento.getBarreraEntrada());
-            preparedStatement.setString(3, evento.getTarjeta());
-            preparedStatement.setString(4, evento.getDni());
-            preparedStatement.setString(5, String.valueOf(evento.getE_s()));
-            preparedStatement.setDate(6, null); 
-            preparedStatement.setTime(7, null); 
-            preparedStatement.setString(8, evento.getPago());
-            preparedStatement.setDate(9, null);
-            preparedStatement.setInt(10, evento.getBarreraSalida());
-
-            preparedStatement.executeUpdate();
-        }
-    }
-
-    private DataSource createDataSourceForBarrera(Barrera barrera) {
-        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver"); // conf el driver correcto para  la DB
-        dataSourceBuilder.url("jdbc:mysql://" + barrera.getIp() + ":" + barrera.getPuerto() + "/" + barrera.getBase());
-        dataSourceBuilder.username(barrera.getUsuario());
-        dataSourceBuilder.password(barrera.getClave());
-        return dataSourceBuilder.build();
-    }
 }
