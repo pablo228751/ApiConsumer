@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ar.com.unont.dato5.entity.Barrera;
+import ar.com.unont.dato5.entity.Eventos;
 import ar.com.unont.dato5.entity.RegisteredUserResponse;
 import ar.com.unont.dato5.entity.Turnero;
 import ar.com.unont.dato5.entity.Turno;
@@ -123,8 +124,10 @@ public class Dato5Setup {
 
     private boolean persistTurnero(Turnero turnero) {
         boolean reg = false;
+
         Iterator<Turno> iterator = turnero.getResultados().iterator();
         while (iterator.hasNext()) {
+            Eventos evento = new Eventos();
             Turno turno = iterator.next();
             if (turnosDiarios != null && !turnosDiarios.isEmpty()) {
                 boolean turnoExiste = false;
@@ -137,6 +140,10 @@ public class Dato5Setup {
 
                 if (!turnoExiste) {
                     turneroService.insertTurnero(turnero);
+                    evento.setEventoId(turno.getTurnoId());
+                    evento.setDni(turno.getDni());
+                    evento.setPago("SI");
+                    eventosService.insertarEvento(evento);
                     turnosDiarios.add(turno);
                     reg = true;
                 } else {
@@ -146,6 +153,10 @@ public class Dato5Setup {
                 }
             } else {
                 turneroService.insertTurnero(turnero);
+                evento.setEventoId(turno.getTurnoId());
+                evento.setDni(turno.getDni());
+                evento.setPago("SI");
+                eventosService.insertarEvento(evento);
                 turnosDiarios.add(turno);
                 reg = true;
             }
@@ -162,7 +173,7 @@ public class Dato5Setup {
 
     private void persistEventos(List<Barrera> barreras, List<Turno> turnero) {
         for (Barrera barrera : barreras) {
-            int errores= 0; //cantidad de errores en un molinete
+            int errores = 0; // cantidad de errores en un molinete
             for (Turno turno : turnero) {
                 log.info("# BARRERA " + barrera.getIp() + " GUARDAR ->" + turno.getTurnoId());
                 Long eventoId = turno.getTurnoId();
@@ -184,11 +195,11 @@ public class Dato5Setup {
                             log.info("Se guardo correctamente el evento. Barrera: " + barrera.getIp());
                         } else {
                             log.error("ERROR AL GRABAR EN la barrera: " + barrera.getIp());
-                            if (errores > 1){
+                            if (errores > 1) {
                                 break;
-                            }else{
+                            } else {
                                 errores++;
-                            }                            
+                            }
                         }
                     }
                 } catch (SQLException e) {

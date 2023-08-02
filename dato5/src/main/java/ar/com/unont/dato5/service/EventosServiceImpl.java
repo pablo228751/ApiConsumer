@@ -2,7 +2,7 @@ package ar.com.unont.dato5.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import ar.com.unont.dato5.entity.Eventos;
 import ar.com.unont.dato5.repository.IEventosRepository;
 
@@ -18,7 +18,9 @@ public class EventosServiceImpl implements IEventosService {
     }
 
     @Override
+    @Transactional
     public void insertarEvento(Eventos evento) {
-        eventosRepository.save(evento);
+        eventosRepository.insertOrUpdateEvento(evento.getEventoId(), evento.getDni(), evento.getPago());
     }
+
 }
