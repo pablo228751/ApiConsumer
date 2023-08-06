@@ -26,11 +26,12 @@ import ar.com.unont.dato5.service.IEventosService;
 public class Dato5Setup {
 
     public static String token;
-    public static int dia = 1;
+    // public static int dia = 1;
     public static boolean expiro = true;
     private String fec;
     private List<Turno> turnosDiarios;
     private List<Barrera> barreras;
+    private int pagina = 1;
 
     @Autowired
     private IBarreraService barreraService;
@@ -86,30 +87,36 @@ public class Dato5Setup {
                 log.info("FEC: " + fec);
                 parametros.put("fecha", fec);
                 parametros.put("centroAtencion", "1770");
-                dia++;
+                // parametros.put("pagina", String.valueOf((int) pagina));
+                // dia++;
 
                 Turnero turnero = consumirApi.consultaTurnos(parametros);
+                if (turnero != null) {
 
-                System.out.println("**************************************************************");
-                System.out.println("ID: " + turnero.getId());
-                System.out.println("Paginas: " + turnero.getPagina());
-                System.out.println("TotalPag: " + turnero.getTotalPaginas());
-                System.out.println("Registros: " + turnero.getRegistros());
-                System.out.println("Resultados: " + turnero.getResultados());
-                System.out.println("**************************************************************");
+                    System.out.println("**************************************************************");
+                    System.out.println("ID: " + turnero.getId());
+                    System.out.println("Paginas: " + turnero.getPagina());
+                    System.out.println("TotalPag: " + turnero.getTotalPaginas());
+                    System.out.println("Registros: " + turnero.getRegistros());
+                    System.out.println("Resultados: " + turnero.getResultados());
+                    System.out.println("**************************************************************");
 
-                if (turnero.getRegistros() > 0) {
-                    // Guardar el objeto Turnero en la base de datos
-                    if (persistTurnero(turnero)) {
-                        System.out.println("");
+                    if (turnero.getRegistros() > 0) {
+                        // Guardar el objeto Turnero en la base de datos
+                        if (persistTurnero(turnero)) {
+                            System.out.println("");
 
-                        // Guardar en eventos en todas las barreras (molinetes)
-                        persistEventos(barreras, turnero.getResultados());
+                            // Guardar en eventos en todas las barreras (molinetes)
+                            persistEventos(barreras, turnero.getResultados());
 
+                        }
+                        pagina++;
+                    } else {
+                        pagina = 1;
+                        log.info("SIN TURNOS, pagina= " + pagina);
                     }
-
-                } else {
-                    log.info("SIN TURNOS");
+                }else{
+                    System.out.println("Errorr TURNERO NULO");
                 }
             }
 

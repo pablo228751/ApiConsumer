@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ar.com.unont.dato5.Dato5Setup;
@@ -93,26 +94,49 @@ public class ConsumirApiImpl implements ConsumirApi {
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                requestEntity,
-                String.class);
+        int statusCode = 0;
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    requestEntity,
+                    String.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            String responseBody = response.getBody();
-            try {
-                Turnero turnero = objectMapper.readValue(responseBody, Turnero.class);
-                return turnero;
-            } catch (Exception e) {
-                System.out.println("Error al convertir el JSON a objeto Turnero");
-                e.printStackTrace();
+            statusCode = response.getStatusCode().value();
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String responseBody = response.getBody();
+                try {
+                    Turnero turnero = objectMapper.readValue(responseBody, Turnero.class);
+                    return turnero;
+                } catch (Exception e) {
+                    System.out.println("Error al convertir el JSON a objeto Turnero");
+                    e.printStackTrace();
+                }
+            } else {
+                log.error("Error: {}", response.getStatusCode());
+                throw new RuntimeException("Error");
             }
-        } else {
-            log.error("Error: {}", response.getStatusCode());
-            throw new RuntimeException("Error");
+        } catch (HttpStatusCodeException ex) {
+            statusCode = ex.getStatusCode().value();
+            log.error("HTTP error status code: {}", statusCode);
+            if (statusCode == 404) {
+                log.error("ERROR *404* -> "+ statusCode);
+            } else if (statusCode == 401){
+                log.error("ERROR *401* Generar Token... ->"+ statusCode);
+                Dato5Setup.expiro = true;        
+            }else if (statusCode == 503) {
+                log.error("ERROR *503* -> "+ statusCode);
+            } else {
+                log.error("Error StatusCode *---* ->" + statusCode);
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Error inesperado: {}", e.getMessage());
+            return null;
         }
 
         return null;
     }
+
 }
