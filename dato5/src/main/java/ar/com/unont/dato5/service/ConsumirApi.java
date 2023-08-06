@@ -8,6 +8,7 @@ import ar.com.unont.dato5.entity.Turnero;
 public interface ConsumirApi {
     RegisteredUserResponse generarToken();
 
-    Turnero consultaTurnos(Map<String, String> parametros);    
+    Turnero consultaTurnos(Map<String, String> parametros);
+    boolean actualizarEstadoTurno(String idTurno);    
 
 }

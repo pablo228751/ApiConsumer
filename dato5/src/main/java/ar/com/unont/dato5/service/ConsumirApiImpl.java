@@ -121,12 +121,12 @@ public class ConsumirApiImpl implements ConsumirApi {
             statusCode = ex.getStatusCode().value();
             log.error("HTTP error status code: {}", statusCode);
             if (statusCode == 404) {
-                log.error("ERROR *404* -> "+ statusCode);
-            } else if (statusCode == 401){
-                log.error("ERROR *401* Generar Token... ->"+ statusCode);
-                Dato5Setup.expiro = true;        
-            }else if (statusCode == 503) {
-                log.error("ERROR *503* -> "+ statusCode);
+                log.error("ERROR *404* -> " + statusCode);
+            } else if (statusCode == 401) {
+                log.error("ERROR *401* Generar Token... ->" + statusCode);
+                Dato5Setup.expiro = true;
+            } else if (statusCode == 503) {
+                log.error("ERROR *503* -> " + statusCode);
             } else {
                 log.error("Error StatusCode *---* ->" + statusCode);
             }
@@ -137,6 +137,55 @@ public class ConsumirApiImpl implements ConsumirApi {
         }
 
         return null;
+    }
+
+    @Override
+    public boolean actualizarEstadoTurno(String idTurno) {
+        boolean actualizado= false;
+        String url = baseUrl + "/turnos/" + idTurno + "/anunciado";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(Dato5Setup.token);
+
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+
+        int statusCode = 0;
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    requestEntity,
+                    String.class);
+
+            statusCode = response.getStatusCode().value();
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("El turno con ID " + idTurno + " ha sido actualizado a estado anunciado.");
+                actualizado = true;
+            } else {
+                log.error("Error al actualizar el estado del turno: {}", response.getStatusCode());
+                throw new RuntimeException("Error al actualizar el estado del turno");                
+            }
+        } catch (HttpStatusCodeException ex) {
+            statusCode = ex.getStatusCode().value();
+            log.error("HTTP error status code: {}", statusCode);
+            if (statusCode == 404) {
+                log.error("ERROR *404* -> " + statusCode);
+            } else if (statusCode == 401) {
+                log.error("ERROR *401* Generar Token... ->" + statusCode);
+                Dato5Setup.expiro = true;
+            } else if (statusCode == 503) {
+                log.error("ERROR *503* -> " + statusCode);
+            } else {
+                log.error("Error StatusCode *---* ->" + statusCode);
+            }
+            return actualizado;
+        } catch (Exception e) {
+            log.error("Error inesperado: {}", e.getMessage());
+            return actualizado;
+        }
+        return actualizado;
     }
 
 }
