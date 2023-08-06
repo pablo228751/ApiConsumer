@@ -14,7 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import ar.com.unont.dato5.Dato5Setup;
+import ar.com.unont.dato5.DatoEventosSetup;
 import ar.com.unont.dato5.entity.RegisteredUserResponse;
 import ar.com.unont.dato5.entity.Turnero;
 import lombok.extern.slf4j.Slf4j;
@@ -57,14 +57,14 @@ public class ConsumirApiImpl implements ConsumirApi {
                     RegisteredUserResponse.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 responseBody = response.getBody();
-                Dato5Setup.token = response.getBody().getAccessToken();
-                Dato5Setup.expiro = false;
+                DatoEventosSetup.token = response.getBody().getAccessToken();
+                DatoEventosSetup.expiro = false;
                 return responseBody;
             } else {
                 responseBody.setAccessToken("");
                 responseBody.setExpiresIn(-1);
                 responseBody.setTokenType("");
-                Dato5Setup.expiro = true;
+                DatoEventosSetup.expiro = true;
                 log.error("Error al registrarse");
                 return responseBody;
             }
@@ -73,7 +73,7 @@ public class ConsumirApiImpl implements ConsumirApi {
             responseBody.setAccessToken("");
             responseBody.setExpiresIn(-2);
             responseBody.setTokenType("");
-            Dato5Setup.expiro = true;
+            DatoEventosSetup.expiro = true;
             return responseBody;
         }
     }
@@ -90,7 +90,7 @@ public class ConsumirApiImpl implements ConsumirApi {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(Dato5Setup.token);
+        headers.setBearerAuth(DatoEventosSetup.token);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -124,7 +124,7 @@ public class ConsumirApiImpl implements ConsumirApi {
                 log.error("ERROR *404* -> " + statusCode);
             } else if (statusCode == 401) {
                 log.error("ERROR *401* Generar Token... ->" + statusCode);
-                Dato5Setup.expiro = true;
+                DatoEventosSetup.expiro = true;
             } else if (statusCode == 503) {
                 log.error("ERROR *503* -> " + statusCode);
             } else {
@@ -146,7 +146,7 @@ public class ConsumirApiImpl implements ConsumirApi {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(Dato5Setup.token);
+        headers.setBearerAuth(DatoEventosSetup.token);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -174,7 +174,7 @@ public class ConsumirApiImpl implements ConsumirApi {
                 log.error("ERROR *404* -> " + statusCode);
             } else if (statusCode == 401) {
                 log.error("ERROR *401* Generar Token... ->" + statusCode);
-                Dato5Setup.expiro = true;
+                DatoEventosSetup.expiro = true;
             } else if (statusCode == 503) {
                 log.error("ERROR *503* -> " + statusCode);
             } else {

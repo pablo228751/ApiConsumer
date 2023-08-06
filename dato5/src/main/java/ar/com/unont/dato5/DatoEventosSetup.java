@@ -23,7 +23,7 @@ import ar.com.unont.dato5.service.IEventosService;
 @Slf4j
 @Data
 @Service
-public class Dato5Setup {
+public class DatoEventosSetup {
 
     public static String token;
     // public static int dia = 1;
@@ -44,7 +44,7 @@ public class Dato5Setup {
     @Autowired
     private final DatabaseService databaseService;
 
-    public Dato5Setup(ITurneroService turneroService, IEventosService eventosService, DatabaseService databaseService) {
+    public DatoEventosSetup(ITurneroService turneroService, IEventosService eventosService, DatabaseService databaseService) {
         this.turneroService = turneroService;
         this.eventosService = eventosService;
         this.databaseService = databaseService;
