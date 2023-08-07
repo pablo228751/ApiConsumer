@@ -11,21 +11,25 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 public class Dato5Application implements CommandLineRunner {
 
-	@Autowired
-	private DatoEventosSetup datoEventos;
-	@Autowired
-	private DatoTipoClienteSetup datoTipoCliente;
+    @Autowired
+    private DatoEventosSetup datoEventos;
+    @Autowired
+    private DatoTipoClienteSetup datoTipoCliente;
 
-	public static void main(String[] args) {
-		SpringApplication.run(Dato5Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Dato5Application.class, args);
+    }
 
-	@Override
-	public void run(String... args) throws Exception {
-		log.info("lanzando DatoEventos");
-		datoEventos.lanzar();
-		log.info("lanzando TipoCliente");
-		datoTipoCliente.lanzar();
-	}
+    @Override
+    public void run(String... args) throws Exception {
+		/*
+        log.info("Lanzando DatoEventos en un hilo 1 ");
+        Thread hiloDatoEventos = new Thread(() -> datoEventos.lanzar());
+        hiloDatoEventos.start();
+		 */
 
+        log.info("Lanzando DatoTipoCliente en un hilo 2 ");
+        Thread hiloDatoTipoCliente = new Thread(() -> datoTipoCliente.lanzar());
+        hiloDatoTipoCliente.start();
+    }
 }

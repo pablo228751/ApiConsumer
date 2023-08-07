@@ -53,9 +53,15 @@ public class DatoEventosSetup {
     public void lanzar() {
         log.info("Iniciando SISTEMA...");
         barreras = barreraService.mostrar();
+        /*
+        for (Barrera barrera : barreras){
+            System.out.println("barrera-> "+barrera.getIp()+ "Activa-> "+barrera.getActiva());
+        }
+         */
+        //System.exit(0);
         // TurnosMemo recupera una lista de Turnos en la base Mysql
         turnosMemo();
-        // System.exit(0);
+        
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {

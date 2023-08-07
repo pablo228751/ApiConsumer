@@ -12,7 +12,6 @@ public class BarreraServiceImpl implements IBarreraService {
     @Autowired
     private final IBarreraRepository barreraRepository;
 
-    
     public BarreraServiceImpl(IBarreraRepository barreraRepository) {
         this.barreraRepository = barreraRepository;
     }
@@ -20,6 +19,8 @@ public class BarreraServiceImpl implements IBarreraService {
     @Override
     public List<Barrera> mostrar() {
         List<Barrera> barreras = barreraRepository.findAll();
+        // Eliminar elementos con "activa" menor a 1
+        barreras.removeIf(barrera -> barrera.getActiva() < 1);
         return barreras;
     }
 }

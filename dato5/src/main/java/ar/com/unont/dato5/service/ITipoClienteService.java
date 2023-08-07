@@ -7,4 +7,6 @@ public interface ITipoClienteService {
     List<TipoCliente> seleccionarTodo();
     void actualizarTipoCliente(TipoCliente tipoCliente);
     void insertarTipoCliente(TipoCliente tipoCliente);
+    void actualizarEstadoTipoCliente(Long id, int estado);
+    List<TipoCliente> seleccionarPorEstados(List<Integer> estados);
 }

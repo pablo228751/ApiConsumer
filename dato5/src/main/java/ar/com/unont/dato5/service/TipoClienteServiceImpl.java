@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ar.com.unont.dato5.entity.TipoCliente;
 import ar.com.unont.dato5.repository.ITipoClienteRepository;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -30,5 +31,15 @@ public class TipoClienteServiceImpl implements ITipoClienteService {
     @Override
     public void insertarTipoCliente(TipoCliente tipoCliente) {
         tipoClienteRepository.save(tipoCliente);
+    }
+
+    @Override
+    @Transactional
+    public void actualizarEstadoTipoCliente(Long id, int estado) {
+        tipoClienteRepository.updateEstado(id, estado);
+    }
+    @Override
+    public List<TipoCliente> seleccionarPorEstados(List<Integer> estados) {
+        return tipoClienteRepository.findByEstadoIn(estados);
     }
 }

@@ -33,7 +33,7 @@ public class TipoCliente {
     private String nombre;
 
     @Column(name = "e_s")
-    private char e_s;
+    private Character e_s;
 
     @Column(name = "nroorden")
     private String nroorden;
@@ -46,16 +46,16 @@ public class TipoCliente {
     private String usuario;
 
     @Column(name = "estado")
-    private int estado;
+    private Integer estado;
 
     @Column(name = "retiro")
-    private boolean retiro;
+    private Boolean retiro;
 
     @Column(name = "nrocuenta")
-    private int nrocuenta;
+    private Integer nrocuenta;
 
     @Column(name = "id_tc")
-    private double id_tc;
+    private Double id_tc;
 
     @Column(name = "observacion")
     private String observacion;
@@ -65,9 +65,9 @@ public class TipoCliente {
     private Date vto;
 
     @Column(name = "tipo")
-    private char tipo;
+    private Character tipo;
 
     @Column(name = "activo")
-    private boolean activo;
+    private Boolean activo;
 
 }

@@ -31,6 +31,7 @@ public class JdbcUtils {
     }
 
     public ResultSet executeQuery(String query) {
+        if (connection != null) {
         try {
             Statement statement = connection.createStatement();
             return statement.executeQuery(query);
@@ -38,6 +39,9 @@ public class JdbcUtils {
             log.error("Error al ejecutar la consulta");
             return null; 
         }
+    }else{
+        return null;
+    }
     }
 
     public int executeUpdate(String query) {
@@ -49,7 +53,7 @@ public class JdbcUtils {
                 return -1; 
             }
         } catch (SQLException e) {
-            log.error("Error al actualizar");
+            log.error("Error al actualizar -> "+e);
             return -1;
         }
     }
