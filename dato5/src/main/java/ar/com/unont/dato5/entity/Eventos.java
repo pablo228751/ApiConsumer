@@ -15,15 +15,16 @@ public class Eventos {
 
     @Id
     private Long eventoId;
-    private int barreraEntrada;
+    private Integer barreraEntrada;
     private String tarjeta;
     private String dni;
-    private char e_s;
+    private Character e_s;
     private LocalDate fechaEntrada;
     private LocalTime horaEntrada;
     private String pago;
     private LocalDate fechaSalida;
-    private int barreraSalida;
+    private LocalTime horaSalida;
+    private Integer barreraSalida;
 
     @Override
     public String toString() {
