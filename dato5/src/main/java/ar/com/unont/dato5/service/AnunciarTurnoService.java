@@ -33,18 +33,20 @@ public class AnunciarTurnoService {
     }
 
     public void lanzar() {
-        barreras = barreraService.mostrar();
-        eventosNoAnunciados = eventosService.eventoSinHoraEntrada();
-        if (!eventosNoAnunciados.isEmpty()) {
-            System.out.println("Se encontraron registros:");
-            for (Eventos even : eventosNoAnunciados) {
-                System.out.println(
-                        "Evento_id -> " + even.getEventoId() + "Fecha -> " + even.getFechaEntrada().toString());
+        while (true) {
+            barreras = barreraService.mostrar();
+            eventosNoAnunciados = eventosService.eventoSinHoraEntrada();
+            if (!eventosNoAnunciados.isEmpty()) {
+                System.out.println("Se encontraron registros:");
+                for (Eventos even : eventosNoAnunciados) {
+                    System.out.println(
+                            "Evento_id -> ---->" + even.getEventoId() + "<---- Fecha -> " + even.getFechaEntrada().toString());
+                }
+                buscarEventosAnunciados(eventosNoAnunciados, barreras);
             }
 
+            espera();
         }
-
-        buscarEventosAnunciados(eventosNoAnunciados, barreras);
 
     }
 
@@ -127,23 +129,44 @@ public class AnunciarTurnoService {
                 databaseService.closeConnection();
             }
         }
-        
-        for (Eventos evento : resultados) {
-            System.out.println("Evento_id: " + evento.getEventoId());
-            System.out.println("Barrera_entrada: " + evento.getBarreraEntrada());
-            System.out.println("Tarjeta: " + evento.getTarjeta());
-            System.out.println("DNI: " + evento.getDni());
-            System.out.println("E/S: " + evento.getE_s());
-            System.out.println("Fecha_entrada: " + evento.getFechaEntrada());
-            System.out.println("Hora_entrada: " + evento.getHoraEntrada());
-            System.out.println("Pago: " + evento.getPago());
-            System.out.println("Fecha_salida: " + evento.getFechaSalida());
-            System.out.println("Hora_salida: " + evento.getHoraSalida());
-            System.out.println("Barrera_salida: " + evento.getBarreraSalida());
-            System.out.println();
+        if(!resultados.isEmpty()){
+
+            for (Eventos evento : resultados) {
+                System.out.println("Evento_id: " + evento.getEventoId());
+                System.out.println("Barrera_entrada: " + evento.getBarreraEntrada());
+                System.out.println("Tarjeta: " + evento.getTarjeta());
+                System.out.println("DNI: " + evento.getDni());
+                System.out.println("E/S: " + evento.getE_s());
+                System.out.println("Fecha_entrada: " + evento.getFechaEntrada());
+                System.out.println("Hora_entrada: " + evento.getHoraEntrada());
+                System.out.println("Pago: " + evento.getPago());
+                System.out.println("Fecha_salida: " + evento.getFechaSalida());
+                System.out.println("Hora_salida: " + evento.getHoraSalida());
+                System.out.println("Barrera_salida: " + evento.getBarreraSalida());
+                System.out.println();
+            }
+            anunciarTurnoApi(resultados);
         }
 
+
         return rta;
+    }
+
+    private boolean anunciarTurnoApi(List<Eventos> resultados){
+        for(Eventos even : resultados){
+            consumirApi.actualizarEstadoTurno(even.getEventoId().toString());
+        }
+        
+        return true;
+    }
+
+    private void espera() {
+        // Sleep para pruebas
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
