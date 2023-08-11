@@ -27,6 +27,7 @@ public class Dato5Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        /*
 		
         log.info("Lanzando DatoEventos en un hilo 1 ");
         Thread hiloDatoEventos = new Thread(() -> datoEventos.lanzar());
@@ -36,10 +37,12 @@ public class Dato5Application implements CommandLineRunner {
         log.info("Lanzando DatoTipoCliente en un hilo 2 ");
         Thread hiloDatoTipoCliente = new Thread(() -> datoTipoCliente.lanzar());
         hiloDatoTipoCliente.start();
+         */
         
         log.info("Lanzando AnunciarTurno en un hilo 3 ");
         Thread hiloAnunciarTurno = new Thread(() -> anunciarTurno.lanzar());
         hiloAnunciarTurno.start();
+       
         
     }
 }

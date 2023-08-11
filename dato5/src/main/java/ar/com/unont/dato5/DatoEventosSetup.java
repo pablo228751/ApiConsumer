@@ -18,6 +18,8 @@ import ar.com.unont.dato5.service.DatabaseService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import java.sql.SQLException;
+import java.time.LocalDate;
+
 import ar.com.unont.dato5.service.IEventosService;
 
 @Slf4j
@@ -76,11 +78,11 @@ public class DatoEventosSetup {
                 log.info("La Credencial es valida, realizando Consulta");
                 Map<String, String> parametros = new HashMap<>();
 
-                // LocalDate currentDate = LocalDate.now();
-                // fec = currentDate.toString();
+                LocalDate currentDate = LocalDate.now();
+                fec = currentDate.toString();
 
                 // Fecha para pruebas...
-                fec = "2023-08-09";
+                //fec = "2023-08-09";
                 /*
                  * if (dia < 10){
                  * fec= "2023-08-0" + String.valueOf(dia);
@@ -93,7 +95,7 @@ public class DatoEventosSetup {
                 log.info("FEC: " + fec);
                 parametros.put("fecha", fec);
                 parametros.put("centroAtencion", "1770");
-                // parametros.put("pagina", String.valueOf((int) pagina));
+                parametros.put("pagina", String.valueOf((int) pagina));
                 // dia++;
 
                 Turnero turnero = consumirApi.consultaTurnos(parametros);
@@ -155,6 +157,7 @@ public class DatoEventosSetup {
                     turneroService.insertTurnero(turnero);
                     evento.setEventoId(turno.getTurnoId());
                     evento.setDni(turno.getDni());
+                    evento.setFechaEntrada(turno.getFechaActualizacion());
                     evento.setPago("SI");
                     eventosService.insertarEvento(evento);
                     turnosDiarios.add(turno);
@@ -168,6 +171,7 @@ public class DatoEventosSetup {
                 turneroService.insertTurnero(turnero);
                 evento.setEventoId(turno.getTurnoId());
                 evento.setDni(turno.getDni());
+                evento.setFechaEntrada(turno.getFechaActualizacion());
                 evento.setPago("SI");
                 eventosService.insertarEvento(evento);
                 turnosDiarios.add(turno);
@@ -192,8 +196,7 @@ public class DatoEventosSetup {
                 Long eventoId = turno.getTurnoId();
                 String dni = turno.getDni();
                 String pago = "SI";
-                String query = "INSERT INTO eventos (evento_id, dni, pago) VALUES ('" + eventoId + "', '" + dni + "', '"
-                        + pago + "') ON DUPLICATE KEY UPDATE dni = '" + dni + "', pago = '" + pago + "'";
+                String query = "INSERT INTO eventos (evento_id, dni, fecha_entrada, pago) VALUES ('" + eventoId + "', '" + dni + "', '" + turno.getFechaActualizacion() +"', '" + pago + "') ON DUPLICATE KEY UPDATE dni = '" + dni + "', fecha_entrada = '" + turno.getFechaActualizacion() + "', pago = '" + pago + "'";
                 String ip = barrera.getIp().trim();
                 int puerto = Integer.valueOf(barrera.getPuerto().trim());
                 String usr = barrera.getUsuario().trim();

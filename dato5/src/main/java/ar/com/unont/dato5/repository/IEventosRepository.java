@@ -16,8 +16,8 @@ public interface IEventosRepository extends JpaRepository<Eventos, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO eventos (evento_id, dni, pago) VALUES (?1, ?2, ?3) ON DUPLICATE KEY UPDATE dni = ?2, pago = ?3", nativeQuery = true)
-    void insertOrUpdateEvento(Long eventoId, String dni, String pago);
+    @Query(value = "INSERT INTO eventos (evento_id, dni, fecha_entrada, pago) VALUES (?1, ?2, ?3, ?4) ON DUPLICATE KEY UPDATE dni = ?2, fecha_entrada = ?3, pago = ?4", nativeQuery = true)
+    void insertOrUpdateEvento(Long eventoId, String dni,LocalDate fechaEntrada,String pago);
 
     List<Eventos> findByFechaEntrada(LocalDate fechaEntrada);
     //List<Eventos> findByFechaEntradaIsNullAndFechaActual(LocalDate fechaActual);

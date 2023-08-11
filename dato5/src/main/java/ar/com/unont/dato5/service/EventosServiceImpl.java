@@ -22,7 +22,7 @@ public class EventosServiceImpl implements IEventosService {
     @Override
     @Transactional
     public void insertarEvento(Eventos evento) {
-        eventosRepository.insertOrUpdateEvento(evento.getEventoId(), evento.getDni(), evento.getPago());
+        eventosRepository.insertOrUpdateEvento(evento.getEventoId(), evento.getDni(),evento.getFechaEntrada(), evento.getPago());
     }
 
      
